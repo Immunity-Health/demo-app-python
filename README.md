@@ -1,32 +1,59 @@
-# Demo App: Django + MySQL + Next.js (TypeScript)
+# Demo App: Django + MySQL + React (Vite + TypeScript)
 
-This repository contains a simple **customer data management demo app** to help non-technical AI builders understand full-stack app structure.
+A simple **customer data management demo app** to help non-technical AI builders understand full-stack app structure.
 
 - **Backend:** Django (MVT pattern)
 - **Database:** MySQL (with SQLite fallback for local quick start)
-- **Frontend:** Next.js with TypeScript
+- **Frontend:** React + TypeScript, built with Vite, routed with React Router
 - **PII Security:** AES-256 encryption/decryption in backend for phone and address
 - **Tests:** Django unit tests for encryption and API behavior
 
-## 1) Project Structure
+## Project Structure
 
 - `/backend` - Django app (`customers`) using MVT
-- `/frontend` - Next.js TypeScript UI
+- `/frontend` - Vite + React + TypeScript SPA (`src/pages`, `src/types`, routed via `react-router-dom`)
+- `run.sh` / `run.bat` - one-shot setup + run script for both servers
+- `test.sh` / `test.bat` - one-shot setup + run script for automated tests
 
-## 2) Backend Setup (Django)
+## Quick Start
+
+Sets up the venv, installs backend/frontend dependencies, runs migrations, and starts both dev servers:
 
 ```bash
-cd /home/runner/work/demo-app-python/demo-app-python/backend
-python -m pip install -r requirements.txt
+./run.sh          # macOS / Linux
 ```
 
-### Configure environment variables
+```bat
+run.bat           # Windows
+```
+
+- `run.sh` runs both servers in the background of the same terminal; `Ctrl+C` stops both.
+- `run.bat` opens each server in its own console window; close a window to stop that server.
+
+Once running:
+- Django: `http://localhost:8000/`
+- React app: `http://localhost:5173/` (proxies `/api` requests to Django — see `frontend/vite.config.ts`)
+
+## Manual Setup
+
+### Backend
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate   # on Windows: venv\Scripts\activate
+python -m pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+Optional environment variables (defaults use SQLite and a dev encryption key):
 
 ```bash
 export DJANGO_DEBUG=true
 export DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
 
-# Optional MySQL settings (if set, Django uses MySQL)
+# Optional step: If set, Django uses MySQL instead of SQLite
 export MYSQL_DATABASE=demo_app
 export MYSQL_USER=root
 export MYSQL_PASSWORD=root
@@ -37,57 +64,31 @@ export MYSQL_PORT=3306
 export PII_ENCRYPTION_KEY="replace-with-strong-secret"
 ```
 
-> If `MYSQL_DATABASE` is not set, Django uses SQLite for quick local development.
-
-### Run backend
+### Frontend
 
 ```bash
-python manage.py migrate
-python manage.py runserver
-```
-
-Django MVT page: `http://localhost:8000/`
-
-API endpoint for frontend: `http://localhost:8000/api/customers/`
-
-## 3) Frontend Setup (Next.js TypeScript)
-
-```bash
-cd /home/runner/work/demo-app-python/demo-app-python/frontend
+cd frontend
 npm install
+npm run dev      # http://localhost:5173/
 ```
 
-Set API URL (optional, default already points to localhost backend):
+Other scripts: `npm run build` (type-check + production build), `npm run preview`, `npm run lint`.
 
-```bash
-export NEXT_PUBLIC_API_BASE_URL="http://localhost:8000/api/customers/"
-```
-
-Run frontend:
-
-```bash
-npm run dev
-```
-
-Open: `http://localhost:3000/`
-
-## 4) AES-256 PII Encryption Notes
+## AES-256 PII Encryption Notes
 
 In the Django `Customer` model:
 - `phone_encrypted` and `address_encrypted` are what gets stored in DB.
 - `phone` and `address` properties decrypt values for display.
 - Encryption uses AES-GCM with a 256-bit key.
 
-## 5) Unit Tests
-
-Run backend unit tests:
+## Unit Tests
 
 ```bash
-cd /home/runner/work/demo-app-python/demo-app-python/backend
-python manage.py test customers
+./test.sh         # macOS / Linux
+test.bat          # Windows
 ```
 
-Included tests validate:
+Sets up the venv and dependencies if needed, then runs the Django `customers` test suite. Included tests validate:
 - encryption/decryption round-trip
 - encrypted storage (no plaintext PII in DB fields)
 - customer API create/list behavior
