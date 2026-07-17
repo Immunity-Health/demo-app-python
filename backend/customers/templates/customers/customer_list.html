@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Data Management Demo</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; }
+      form { margin-bottom: 2rem; display: grid; gap: 0.6rem; max-width: 500px; }
+      input, textarea, button { padding: 0.5rem; font-size: 0.95rem; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { border: 1px solid #ddd; padding: 0.5rem; }
+      th { background: #f6f6f6; text-align: left; }
+      .small { color: #666; font-size: 0.85rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Customer Data Management (Django MVT)</h1>
+    <p class="small">Phone and address are encrypted with AES-256 before storing in the database.</p>
+
+    <h2>Add Customer</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Save Customer</button>
+    </form>
+
+    <h2>Customers</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone (decrypted for display)</th>
+          <th>Address (decrypted for display)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for customer in customers %}
+          <tr>
+            <td>{{ customer.first_name }} {{ customer.last_name }}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.phone }}</td>
+            <td>{{ customer.address }}</td>
+            <td>
+              <form method="post" action="{% url 'customer_delete' customer.id %}">
+                {% csrf_token %}
+                <button type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">No customers yet.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
