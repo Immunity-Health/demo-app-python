@@ -9,6 +9,7 @@ class Customer(models.Model):
     email = models.EmailField(unique=True)
     phone_encrypted = models.TextField(blank=True, default="")
     address_encrypted = models.TextField(blank=True, default="")
+    aadhar_number_encrypted = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -34,3 +35,13 @@ class Customer(models.Model):
     @address.setter
     def address(self, value: str) -> None:
         self.address_encrypted = encrypt_value(value)
+
+    @property
+    def aadhar_number(self) -> str:
+        if not self.aadhar_number_encrypted:
+            return ""
+        return decrypt_value(self.aadhar_number_encrypted)
+
+    @aadhar_number.setter
+    def aadhar_number(self, value: str) -> None:
+        self.aadhar_number_encrypted = encrypt_value(value)

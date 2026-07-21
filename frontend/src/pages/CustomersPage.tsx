@@ -8,6 +8,7 @@ const EMPTY_FORM: NewCustomer = {
   email: '',
   phone: '',
   address: '',
+  aadhar_number: '',
 }
 
 function CustomersPage() {
@@ -88,6 +89,11 @@ function CustomersPage() {
           value={form.address}
           onChange={(e) => setForm({ ...form, address: e.target.value })}
         />
+        <input
+          placeholder="Aadhar number"
+          value={form.aadhar_number}
+          onChange={(e) => setForm({ ...form, aadhar_number: e.target.value })}
+        />
         <button type="submit" disabled={submitting}>
           {submitting ? 'Adding…' : 'Add customer'}
         </button>
@@ -108,6 +114,7 @@ function CustomersPage() {
               <th>Email</th>
               <th>Phone</th>
               <th>Address</th>
+              <th>Aadhar Number</th>
             </tr>
           </thead>
           <tbody>
@@ -119,6 +126,7 @@ function CustomersPage() {
                 <td>{customer.email}</td>
                 <td>{customer.phone}</td>
                 <td>{customer.address}</td>
+                <td>{customer.aadhar_number}</td>
               </tr>
             ))}
           </tbody>

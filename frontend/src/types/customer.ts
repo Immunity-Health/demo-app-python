@@ -5,6 +5,7 @@ export interface Customer {
   email: string
   phone: string
   address: string
+  aadhar_number: string
 }
 
 export type NewCustomer = Omit<Customer, 'id'>

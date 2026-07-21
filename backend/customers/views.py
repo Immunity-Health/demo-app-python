@@ -49,6 +49,7 @@ def customer_api(request):
                 "email": c.email,
                 "phone": c.phone,
                 "address": c.address,
+                "aadhar_number": c.aadhar_number,
             }
             for c in Customer.objects.order_by("-created_at")
         ]
@@ -62,5 +63,6 @@ def customer_api(request):
     )
     customer.phone = body.get("phone", "")
     customer.address = body.get("address", "")
+    customer.aadhar_number = body.get("aadhar_number", "")
     customer.save()
     return JsonResponse({"id": customer.id}, status=201)
