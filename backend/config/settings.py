@@ -24,7 +24,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "accounts",
     "customers",
+]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "accounts.backends.RBACBackend",
 ]
 
 MIDDLEWARE = [
@@ -110,3 +116,39 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 PII_ENCRYPTION_KEY = os.getenv("PII_ENCRYPTION_KEY")
 if not PII_ENCRYPTION_KEY:
     PII_ENCRYPTION_KEY = hashlib.sha256(SECRET_KEY.encode("utf-8")).hexdigest()
+
+# SSO (Google + Zoho OAuth2/OIDC)
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
+ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID", "")
+ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET", "")
+ZOHO_ACCOUNTS_DOMAIN = os.getenv("ZOHO_ACCOUNTS_DOMAIN", "https://accounts.zoho.com")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+LOGIN_URL = f"{FRONTEND_URL}/login"
+
+# Logging: "stdout" for plain console logs (dev default), "otel" to export via OpenTelemetry OTLP.
+LOG_BACKEND = os.getenv("LOG_BACKEND", "stdout").lower()
+
+if LOG_BACKEND == "otel":
+    from config.otel_logging import get_otel_handler
+
+    _log_handler_name = "otel"
+    _log_handlers = {"otel": {"()": get_otel_handler}}
+else:
+    _log_handler_name = "console"
+    _log_handlers = {
+        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
+    }
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"},
+    },
+    "handlers": _log_handlers,
+    "root": {"handlers": [_log_handler_name], "level": "INFO"},
+    "loggers": {
+        "django": {"handlers": [_log_handler_name], "level": "INFO", "propagate": False},
+    },
+}

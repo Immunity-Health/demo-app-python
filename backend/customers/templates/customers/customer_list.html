@@ -16,7 +16,7 @@
   </head>
   <body>
     <h1>Customer Data Management (Django MVT)</h1>
-    <p class="small">Phone and address are encrypted with AES-256 before storing in the database.</p>
+    <p class="small">Phone, address, and Aadhar number are encrypted with AES-256 before storing in the database.</p>
 
     <h2>Add Customer</h2>
     <form method="post">
@@ -33,6 +33,7 @@
           <th>Email</th>
           <th>Phone (decrypted for display)</th>
           <th>Address (decrypted for display)</th>
+          <th>Aadhar Number (decrypted for display)</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -43,6 +44,7 @@
             <td>{{ customer.email }}</td>
             <td>{{ customer.phone }}</td>
             <td>{{ customer.address }}</td>
+            <td>{{ customer.aadhar_number }}</td>
             <td>
               <form method="post" action="{% url 'customer_delete' customer.id %}">
                 {% csrf_token %}
@@ -52,7 +54,7 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="5">No customers yet.</td>
+            <td colspan="6">No customers yet.</td>
           </tr>
         {% endfor %}
       </tbody>
