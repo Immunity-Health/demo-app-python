@@ -1,17 +1,26 @@
 import json
 
-from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+
+from accounts.decorators import require_permission
 
 from .forms import CustomerForm
 from .models import Customer
 
 
+@login_required
 @require_http_methods(["GET", "POST"])
 def customer_list(request):
+    if not request.user.has_perm("customers.view_customer"):
+        return HttpResponseForbidden("You do not have permission to view customers.")
+
     if request.method == "POST":
+        if not request.user.has_perm("customers.add_customer"):
+            return HttpResponseForbidden("You do not have permission to add customers.")
         form = CustomerForm(request.POST)
         if form.is_valid():
             form.save()
@@ -30,6 +39,8 @@ def customer_list(request):
     )
 
 
+@login_required
+@require_permission("customers.delete_customer")
 @require_http_methods(["POST"])
 def customer_delete(request, customer_id):
     customer = get_object_or_404(Customer, pk=customer_id)
@@ -41,6 +52,11 @@ def customer_delete(request, customer_id):
 @require_http_methods(["GET", "POST"])
 def customer_api(request):
     if request.method == "GET":
+        if not request.user.is_authenticated:
+            return JsonResponse({"detail": "Authentication required"}, status=401)
+        if not request.user.has_perm("customers.view_customer"):
+            return JsonResponse({"detail": "Permission denied"}, status=403)
+
         payload = [
             {
                 "id": c.id,
@@ -54,6 +70,11 @@ def customer_api(request):
             for c in Customer.objects.order_by("-created_at")
         ]
         return JsonResponse(payload, safe=False)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"detail": "Authentication required"}, status=401)
+    if not request.user.has_perm("customers.add_customer"):
+        return JsonResponse({"detail": "Permission denied"}, status=403)
 
     body = json.loads(request.body.decode("utf-8"))
     customer = Customer(

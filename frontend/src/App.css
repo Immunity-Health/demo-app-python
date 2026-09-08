@@ -80,3 +80,54 @@ main {
 .error {
   color: #c0392b;
 }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.user-info button {
+  font: inherit;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 360px;
+  margin: 96px auto;
+  text-align: center;
+}
+
+.login-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.login-button {
+  font: inherit;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--text-h);
+  text-decoration: none;
+}
+
+.login-button-google {
+  background: #fff;
+}
+
+.login-button-zoho {
+  background: var(--bg);
+}

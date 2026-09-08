@@ -1,10 +1,15 @@
 import json
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from accounts.models import Permission
+
 from .encryption import decrypt_value, encrypt_value
 from .models import Customer
+
+User = get_user_model()
 
 
 class EncryptionTests(TestCase):
@@ -33,6 +38,11 @@ class CustomerTests(TestCase):
         self.assertEqual(customer.address, "123 Demo St")
 
     def test_customer_api_create_and_list(self):
+        user = User.objects.create_user(username="admin@example.com", email="admin@example.com")
+        Permission.objects.get(code="customers.view_customer").users.add(user)
+        Permission.objects.get(code="customers.add_customer").users.add(user)
+        self.client.force_login(user)
+
         response = self.client.post(
             reverse("customer_api"),
             data=json.dumps(
