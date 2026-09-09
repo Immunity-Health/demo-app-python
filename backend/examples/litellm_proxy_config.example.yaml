@@ -1,0 +1,15 @@
+# Example LiteLLM Proxy config. Copy to litellm_proxy_config.yaml, set your
+# provider key in the environment, then run:
+#   litellm --config litellm_proxy_config.example.yaml --port 4000
+#
+# The `model_name` below is what callers pass as `model` (see
+# litellm_structured_output_example.py); `litellm_params.model` is the real
+# provider/model it's routed to.
+model_list:
+  - model_name: claude-opus-5
+    litellm_params:
+      model: anthropic/claude-opus-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+general_settings:
+  master_key: sk-1234
